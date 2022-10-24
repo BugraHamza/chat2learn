@@ -1,0 +1,45 @@
+version: '3.1'
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:1.13
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+      - flask-app
+  app:
+    container_name: chat2learn-spring
+    image: chat2learn-spring
+    build: ./
+    ports:
+      - "9092:9092"
+    restart: always
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresqldb:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgrespw
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - FEIGN.CLIENT.URL=flask-app:9090
+    depends_on:
+      - postgresqldb
+      - flask-app
+  flask-app:
+    container_name: chat2learn-flask
+    image: chat2learn-flask
+    restart: always
+    build: ../../flask-app/
+    ports:
+      - "9090:9090"
+  postgresqldb:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgrespw
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
