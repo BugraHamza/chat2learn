@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,14 +29,15 @@ public class ChatSession extends Auditable {
     @JoinColumn(name = "person_id",nullable = false)
     private Person person;
 
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "model_id",nullable = false)
     private Model model;
 
     @Convert(converter = HashMapConverter.class)
     private Map<String, Object> state;
 
     @OneToMany(mappedBy="chatSession", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private Set<Message> messages;
+    private Set<Message> messages = new HashSet<>();
 
 
 

@@ -9,7 +9,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExeptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = ApiRequestException.class)
-    public ResponseEntity<ApiRequestException> DataNotFoundResponse(ApiRequestException apiRequestException) {
-        return new ResponseEntity<>(apiRequestException,apiRequestException.getHttpStatus());
+    public ResponseEntity<ApiErrorResponse> DataNotFoundResponse(ApiRequestException apiRequestException) {
+        return new ResponseEntity<ApiErrorResponse>(
+                new ApiErrorResponse(
+                        apiRequestException.getMessage(),
+                        apiRequestException.getHttpStatus(),
+                        apiRequestException.getTimestamp()
+                ),
+                apiRequestException.getHttpStatus());
     }
 }

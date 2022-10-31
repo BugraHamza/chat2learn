@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -26,12 +27,13 @@ public class Person extends Auditable {
 
     private String lastname;
 
+    @Column(unique=true)
     private String email;
 
     private String password;
 
     @OneToMany(mappedBy="person",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private Set<ChatSession> sessions;
+    private Set<ChatSession> sessions =  new HashSet<>();
 
 
 

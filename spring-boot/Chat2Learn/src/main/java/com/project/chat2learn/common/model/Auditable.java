@@ -1,5 +1,6 @@
 package com.project.chat2learn.common.model;
 
+import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -13,11 +14,12 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@Getter
 public abstract class Auditable {
 
     @CreatedBy
     @Column( updatable = false)
-    protected Long createdBy;
+    protected String createdBy;
 
     @CreatedDate
     @Column(updatable = false)
@@ -25,7 +27,7 @@ public abstract class Auditable {
 
     @LastModifiedBy
     @Column
-    protected Long lastModifiedBy;
+    protected String lastModifiedBy;
 
     @LastModifiedDate
     @Column

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "model")
@@ -23,7 +25,7 @@ public class Model extends Auditable {
 
     private String name;
 
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    ChatSession chatSession;
+    @OneToMany(mappedBy="model",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private Set<ChatSession> sessions =  new HashSet<>();
 
 }

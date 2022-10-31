@@ -21,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Log4j2
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -42,14 +44,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public RegisterResponse register(RegisterRequest request) {
         validateEmailAndPassword(request.getEmail(), request.getPassword(), request.getConfirmPassword());
 
-        Person person = personRepository.findByEmail(request.getEmail()).orElse(null);
+        Optional<Person> personByEmail = personRepository.findByEmail(request.getEmail());
 
-        if(person == null ) {
-            throw new ApiRequestException("Please make sure you got the OTP before registering!",HttpStatus.BAD_REQUEST);
-
+        if(personByEmail.isPresent()) {
+            throw new ApiRequestException("This email is already in use !",HttpStatus.BAD_REQUEST);
         }
 
-
+        Person person = new Person();
         person.setPassword(encoder.encode(request.getPassword()));
         person.setName(request.getName());
         person.setLastname(request.getLastname());
@@ -57,7 +58,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Person registeredPerson = personRepository.save(person);
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(registeredPerson.getEmail(), registeredPerson.getPassword()));
+                new UsernamePasswordAuthenticationToken(registeredPerson.getEmail(), request.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);

@@ -33,7 +33,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             Person person = new ObjectMapper()
                     .readValue(req.getInputStream(), Person.class);
-
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             person.getEmail(),
@@ -49,7 +48,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest req,
                                             HttpServletResponse res,
                                             FilterChain chain,
-                                            Authentication auth) throws IOException, ServletException {
+                                            Authentication auth){
 
 
         String token = Jwts.builder()

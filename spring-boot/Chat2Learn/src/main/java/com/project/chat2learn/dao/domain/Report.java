@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,13 +27,13 @@ public class Report extends Auditable {
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private Message message;
 
-    private String correct_text;
+    private String correctText;
 
     @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinTable(
             name = "report_error",
             joinColumns = @JoinColumn(name = "report_id"),
             inverseJoinColumns = @JoinColumn(name = "grammer_error_id"))
-    Set<GrammerError> errors;
+    List<GrammerError> errors =  new ArrayList<>();
 
 }

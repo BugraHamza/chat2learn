@@ -4,5 +4,5 @@ public enum SenderType {
 
     PERSON,
 
-    MODEL
+    BOT
 }

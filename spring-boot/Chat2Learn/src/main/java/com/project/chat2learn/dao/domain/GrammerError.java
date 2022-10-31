@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,6 +28,6 @@ public class GrammerError extends Auditable {
     private String description;
 
     @ManyToMany(mappedBy = "errors",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private Set<Report> reports;
+    private List<Report> reports = new ArrayList<>();
 
 }
