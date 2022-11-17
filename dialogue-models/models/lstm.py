@@ -6,8 +6,18 @@ import torch
 from torch import nn
 from torchtext.vocab import GloVe
 
-from base_utils import BaseTokenizer, BaseModel, DataPreparer
+from base_utils import BaseChatter, BaseTokenizer, BaseModel, DataPreparer
 
+
+class LSTMChatter(BaseChatter):
+    def tokenize(self, text: str) -> List[str]:
+        pass
+
+    def from_pretrained(self, model_path: str, tokenizer_path: str):
+        pass
+
+    def chat(self, text: str) -> str:
+        pass
 
 class LSTMTokenizer(BaseTokenizer):
     def __init__(self, vocab_path=None, split_regex: str = r'\s+', **kwargs):
@@ -23,7 +33,8 @@ class LSTMTokenizer(BaseTokenizer):
                     self.idx2vocab[idx] = word.strip()
         elif self.glove_obj:
             # add special tokens to glove embeddings as zero vectors
-            self.glove_obj.vectors = torch.cat([self.glove_obj.vectors, torch.zeros(len(self.special_tokens), self.glove_obj.dim)], dim=0)
+            self.glove_obj.vectors = torch.cat(
+                [self.glove_obj.vectors, torch.zeros(len(self.special_tokens), self.glove_obj.dim)], dim=0)
 
             # add special tokens to glove_obj
             for token in self.special_tokens.values():
@@ -59,15 +70,14 @@ class LSTMModel(nn.Module, BaseModel):
         else:
             raise ValueError('Either glove_obj or vocab_size must be provided')
 
-
         if self.glove_obj:
             # use glove embeddings
-            self.embedding = nn.Embedding.from_pretrained(self.glove_obj.vectors, freeze=True, padding_idx=self.padding_idx)
+            self.embedding = nn.Embedding.from_pretrained(self.glove_obj.vectors, freeze=True,
+                                                          padding_idx=self.padding_idx)
         else:
             # use random embeddings
             self.embedding = nn.Embedding(self.vocab_size, self.embedding_dim, padding_idx=self.padding_idx)
 
-        self.lstm = nn.LSTM(input_size=self.embedding_dim, hidden_size=128, num_layers=16, batch_first=True)
         self.fc = nn.Linear(128, self.vocab_size)
 
     def forward(self, x):
@@ -149,10 +159,6 @@ if __name__ == '__main__':
     # get train and test dataloaders
     train_dataloader = data_prep('train', 'dialogue', batch_size=BS, shuffle=True)
     test_dataloader = data_prep('validation', 'dialogue', batch_size=BS, shuffle=True)
-
-
-
-
 
     # fit model
     # model.fit(train_dataloader, epochs=1, criterion=nn.CrossEntropyLoss(), optimizer=torch.optim.Adam(model.parameters()))

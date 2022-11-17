@@ -2,9 +2,9 @@ from typing import List, Union
 
 import torch
 from torch import nn
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoTokenizer, AutoModelForCausalLM
 
-from base_utils import BaseTokenizer, BaseModel, DataPreparer
+from base_utils import BaseTokenizer, BaseModel, BaseChatter, DataPreparer
 
 
 class GPTTokenizer(BaseTokenizer):
@@ -16,10 +16,10 @@ class GPTTokenizer(BaseTokenizer):
     def _tokenize(self, texts: List[str]) -> List[List[str]]:
         return [self.tokenizer.tokenize(text) for text in texts]
 
-    def encode(self, texts: Union[str | List[str]], max_length: Union[None | int] = None) -> List[List[int]]:
+    def encode(self, texts, max_length=None) -> List[List[int]]:
         return self.tokenizer(texts, max_length=max_length, padding='max_length', truncation=True, return_tensors='pt')
 
-    def decode(self, tokens: Union[List[int] | List[List[int]]]) -> Union[str | List[str]]:
+    def decode(self, tokens):
         if isinstance(tokens[0], list):
             return self.tokenizer.batch_decode(tokens)
         else:
@@ -81,32 +81,29 @@ class GPTModel(nn.Module, BaseModel):
         print(f'[INFO]: Model loaded from {path}')
 
 
+class GPTChatter(BaseChatter):
+    def __init__(self, model_path: str):
+        self.model_path = model_path
+        self.tokenizer = AutoTokenizer.from_pretrained('gpt2')
+        self.tokenizer.add_special_tokens({'bos_token': '<BOS>', 'eos_token': '<EOS>',
+                                           'unk_token': '<UNK>', 'pad_token': '<PAD>'})
+
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_path)
+
+    def chat(self, text: str):
+        text = self.tokenizer.bos_token + text + self.tokenizer.pad_token
+        tok_text = self.tokenizer(text, max_length=50, return_tensors='pt')
+        gpt_output = self.model.generate(tok_text['input_ids'], max_length=50, num_beams=5, temperature=0.7,
+                                         no_repeat_ngram_size=2, early_stopping=True,
+                                         do_sample=True, num_return_sequences=1)
+
+        return self.tokenizer.decode(gpt_output[0], skip_special_tokens=True)
+
+
 if __name__ == '__main__':
-    # load tokenizer
-    tokenizer = GPTTokenizer(model_name='gpt2', special_tokens={'bos_token': '<bos>',
-                                                                'eos_token': '<eos>',
-                                                                'pad_token': '<pad>'})
+    galip = GPTChatter(model_path='../saved models/gpt_model')
 
-    # load model
-    model = GPTModel(tokenizer_length=len(tokenizer.tokenizer))
-
-    # initialize data preparer for seq2seq training
-    data_prep = DataPreparer(tokenizer, 'knkarthick/dialogsum', 'gpt2_lm_modeling')
-
-    # get train and test dataloaders
-    train_dataloader = data_prep('train', 'dialogue', batch_size=4, shuffle=True)
-    test_dataloader = data_prep('validation', 'dialogue', batch_size=4, shuffle=True)
-
-    # fit model
-    model.fit(train_dataloader, epochs=1, optimizer=torch.optim.Adam(model.model.parameters()))
-
-    # evaluate model
-    model.evaluate(test_dataloader)
-
-    # predict
-    sent = 'What will you do today?'
-    enc_sent = tokenizer.encode(sent)
-    pred = model.predict(enc_sent)
-
-    print(f'Input: {sent}')
-    print(f'Output: {tokenizer.tokenizer.decode(pred[0])}')
+    while True:
+        sent = input("You: ")
+        ans = galip.chat(sent)
+        print(ans)
