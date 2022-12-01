@@ -8,7 +8,7 @@ from torch.utils.data import TensorDataset, DataLoader, Dataset
 
 class BaseChatter:
     def __init__(self):
-        raise ValueError('Use from_pretrained() to instantiate this chatter..')
+        pass
 
     def from_pretrained(self, model_path: str, tokenizer_path: str):
         pass
