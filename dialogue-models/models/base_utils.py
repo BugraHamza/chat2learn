@@ -10,7 +10,10 @@ class BaseChatter:
     def __init__(self):
         pass
 
-    def from_pretrained(self, model_path: str, tokenizer_path: str):
+    def tokenize(self, text: str) -> List[str]:
+        pass
+
+    def detokenize(self, tokens: List[str]) -> str:
         pass
 
     def chat(self, text: str) -> str:

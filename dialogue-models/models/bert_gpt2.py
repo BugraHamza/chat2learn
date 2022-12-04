@@ -16,24 +16,25 @@ class BertGPTChatter(BaseChatter):
 
         return {'input_ids': tok_text['input_ids'], 'attention_mask': tok_text['attention_mask']}
 
-    def decode(self, text: str):
-        return self.decoder_tokenizer.decode(text, padding='max_length', truncation=True, skip_special_tokens=True)
+    def decode(self, output):
+        return self.decoder_tokenizer.decode(output, padding='max_length', truncation=True, skip_special_tokens=True)
 
     def chat(self, text: str):
         text = self.tokenize(text)
         gpt_output = self.model.generate(**text, max_new_tokens=50, num_beams=7, temperature=0.8,
                                     no_repeat_ngram_size=3, early_stopping=True, do_sample=True,
                                     num_return_sequences=1, top_k=50, top_p=0.95,
-                                    bos_token_id=self.encoder_tokenizer.bos_token_id,
-                                    pad_token_id=self.encoder_tokenizer.pad_token_id,
-                                    eos_token_id=self.encoder_tokenizer.eos_token_id,
-                                    decoder_start_token_id=self.decoder_tokenizer.pad_token_id)
+                                    bos_token_id=self.decoder_tokenizer.bos_token_id,
+                                    pad_token_id=self.decoder_tokenizer.pad_token_id,
+                                    eos_token_id=self.decoder_tokenizer.eos_token_id,
+                                    #decoder_start_token_id=self.decoder_tokenizer.bos_token_id
+                                    )
         print(gpt_output)
         return self.decode(gpt_output[0])
 
 
 if __name__ == '__main__':
-    galip = BertGPTChatter(model_path='Quimba/bert_gpt2_dialog_generation/checkpoint-1000')
+    galip = BertGPTChatter(model_path='Quimba/bert_gpt2_dialog_generation')
 
     while True:
         sent = input("You: ")
