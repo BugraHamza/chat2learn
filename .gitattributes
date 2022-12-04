@@ -1,3 +1,5 @@
+dialogue-models/saved[[:space:]]models/lstm_model/lstm_model_3.pt filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
 /flask-app/venv/lib/python3.10/site-packages/click/core.py filter=lfs diff=lfs merge=lfs -text
 /flask-app/venv/lib/python3.10/site-packages/markupsafe/_speedups.cpython-310-darwin.so filter=lfs diff=lfs merge=lfs -text
 /flask-app/venv/lib/python3.10/site-packages/pip/_vendor/certifi/cacert.pem filter=lfs diff=lfs merge=lfs -text
