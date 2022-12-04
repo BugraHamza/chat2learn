@@ -11,7 +11,7 @@ class BertGPTChatter(BaseChatter):
 
         self.model = EncoderDecoderModel.from_pretrained(self.model_path, use_auth_token=True)
 
-    def tokenize(self, text: str):
+    def tokenize(seltext: str):
         tok_text = self.encoder_tokenizer(text, padding='max_length', truncation=True, return_tensors='pt')
 
         return {'input_ids': tok_text['input_ids'], 'attention_mask': tok_text['attention_mask']}
