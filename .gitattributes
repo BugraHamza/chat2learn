@@ -35,3 +35,5 @@
 /report/Online[[:space:]]Gantt[[:space:]]20221203-5.png filter=lfs diff=lfs merge=lfs -text
 /report/UML[[:space:]]class-2.png filter=lfs diff=lfs merge=lfs -text
 /dialogue-models/saved[[:space:]]models/lstm_model/lstm_tokenizer.pth filter=lfs diff=lfs merge=lfs -text
+/dialogue-models/saved[[:space:]]models/lstm_model/lstm_model_best.pt filter=lfs diff=lfs merge=lfs -text
+/dialogue-models/saved[[:space:]]models/lstm_model/lstm_model_last.pt filter=lfs diff=lfs merge=lfs -text
