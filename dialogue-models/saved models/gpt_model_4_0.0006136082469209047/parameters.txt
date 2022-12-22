@@ -1,3 +1,0 @@
-batch size = 4
-learning rate = 0.0006136082469209047
-loss = 1.138088448612972
