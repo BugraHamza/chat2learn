@@ -38,11 +38,3 @@
 /dialogue-models/saved[[:space:]]models/lstm_model/lstm_tokenizer.pth filter=lfs diff=lfs merge=lfs -text
 /dialogue-models/saved[[:space:]]models/lstm_model/lstm_model_best.pt filter=lfs diff=lfs merge=lfs -text
 /dialogue-models/saved[[:space:]]models/lstm_model/lstm_model_last.pt filter=lfs diff=lfs merge=lfs -text
-/dialogue-models/models/compile[[:space:]]gpt_model/build/lib.linux-x86_64-cpython-38/gpt_model.cpython-38-x86_64-linux-gnu.so filter=lfs diff=lfs merge=lfs -text
-/dialogue-models/models/compile[[:space:]]gpt_model/build/temp.linux-x86_64-cpython-38/gpt_model.o filter=lfs diff=lfs merge=lfs -text
-/dialogue-models/models/compile[[:space:]]gpt_model/gpt_model.c filter=lfs diff=lfs merge=lfs -text
-/dialogue-models/models/compile[[:space:]]gpt_model/gpt_model.cpython-38-x86_64-linux-gnu.so filter=lfs diff=lfs merge=lfs -text
-/dialogue-models/models/lstm-model.ipynb filter=lfs diff=lfs merge=lfs -text
-/dialogue-models/saved[[:space:]]models/gpt_model_1.110/pytorch_model.bin filter=lfs diff=lfs merge=lfs -text
-/dialogue-models/saved[[:space:]]models/gpt_model_4_0.0006136082469209047/pytorch_model.bin filter=lfs diff=lfs merge=lfs -text
-/dialogue-models/saved[[:space:]]models/lstm_model/lstm_model.pt filter=lfs diff=lfs merge=lfs -text
