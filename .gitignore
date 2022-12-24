@@ -1,0 +1,6 @@
+.DS_Store
+.idea
+/dialogue-models/models/.ipynb_checkpoints/
+/dialogue-models/saved models/
+/dialogue-models/models/.idea
+/dialogue-models/models/.ipynb_checkpoints
