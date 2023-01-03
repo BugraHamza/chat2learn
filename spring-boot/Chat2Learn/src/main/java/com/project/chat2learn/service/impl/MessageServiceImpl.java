@@ -2,17 +2,17 @@ package com.project.chat2learn.service.impl;
 
 import com.project.chat2learn.common.enums.SenderType;
 import com.project.chat2learn.common.exception.ApiRequestException;
-import com.project.chat2learn.common.external.flask.model.response.BaseResponse;
+import com.project.chat2learn.common.external.flask.model.response.ChatBotResponse;
+import com.project.chat2learn.common.external.flask.model.response.GrammerCheckResponse;
 import com.project.chat2learn.common.external.flask.service.BotService;
 import com.project.chat2learn.dao.domain.ChatSession;
-import com.project.chat2learn.dao.domain.GrammerError;
+import com.project.chat2learn.dao.domain.ReportError;
 import com.project.chat2learn.dao.domain.Message;
 import com.project.chat2learn.dao.domain.Report;
 import com.project.chat2learn.dao.repository.ChatSessionRepository;
 import com.project.chat2learn.dao.repository.GrammerErrorRepository;
 import com.project.chat2learn.dao.repository.MessageRepository;
 import com.project.chat2learn.mapper.MessageMapper;
-import com.project.chat2learn.service.GrammerErrorService;
 import com.project.chat2learn.service.MessageService;
 import com.project.chat2learn.service.model.dto.MessageDTO;
 import com.project.chat2learn.service.model.response.CreateMessageResponse;
@@ -27,10 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,18 +70,34 @@ public class MessageServiceImpl implements MessageService {
             throw new ApiRequestException("Message is empty", HttpStatus.BAD_REQUEST);
         }
 
-        BaseResponse response = botService.messageBotWithId(session.getModel().getId(), message);
+        CompletableFuture<GrammerCheckResponse> grammerCheckResponse = botService.checkGrammer(message);
 
-        Message savedPersonMessage = createPersonMessage(message, session, response);
+        CompletableFuture<ChatBotResponse> chatResponse = botService.messageBot(session.getModel().getId(), message);
 
-        Message savedBotMessage = createBotMessage(session, response);
+        Message savedPersonMessage = null;
+        try {
+            savedPersonMessage = createPersonMessage(message, session, grammerCheckResponse.get());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+
+        Message savedBotMessage = null;
+        try {
+            savedBotMessage = createBotMessage(session, chatResponse.get());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         return createMessageResponse(savedPersonMessage, savedBotMessage);
     }
 
-    private Message createBotMessage(ChatSession session, BaseResponse response) {
+    private Message createBotMessage(ChatSession session, ChatBotResponse response) {
         Message botMessage = new Message();
-        botMessage.setText(response.getResponseMessage());
+        botMessage.setText(response.getResponseText());
         botMessage.setChatSession(session);
         botMessage.setSenderType(SenderType.BOT);
 
@@ -90,18 +105,30 @@ public class MessageServiceImpl implements MessageService {
         return savedBotMessage;
     }
 
-    private Message createPersonMessage(String message, ChatSession session, BaseResponse response) {
+    private Message createPersonMessage(String message, ChatSession session, GrammerCheckResponse response) {
         Message newMessage = new Message();
         newMessage.setText(message);
         newMessage.setChatSession(session);
         newMessage.setSenderType(SenderType.PERSON);
+        newMessage.setScore(response.getScore());
+        if (response.getCorrectText() != null) {
 
-        Report report =  new Report();
-        report.setMessage(newMessage);
-        report.setCorrectText(response.getCorrectText());
-        report.setErrors(grammerErrorListByIdList(response.getGrammarErrors()));
+            Report report = new Report();
+            report.setMessage(newMessage);
+            report.setTaggedCorrectText(response.getTaggedCorrectText());
+            report.setCorrectText(response.getCorrectText());
 
-        newMessage.setReport(report);
+            List<ReportError> errors = response.getErrorTypes().stream().map(error -> {
+                ReportError reportError = new ReportError();
+                reportError.setReport(report);
+                reportError.setCode(error.getCode());
+                reportError.setDescription(error.getDescription());
+                return reportError;
+            }).collect(Collectors.toList());
+            report.setErrors(errors);
+
+            newMessage.setReport(report);
+        }
         Message savedMessage = messageRepository.save(newMessage);
         return savedMessage;
     }
@@ -111,13 +138,6 @@ public class MessageServiceImpl implements MessageService {
         createMessageResponse.setPersonMessage(mapper.messageToMessageDTO(savedPersonMessage));
         createMessageResponse.setBotMessage(mapper.messageToMessageDTO(savedBotMessage));
         return createMessageResponse;
-    }
-    private List<GrammerError> grammerErrorListByIdList(Set<Long> idList){
-        if(CollectionUtils.isEmpty(idList)){
-            log.warn("Id list is empty");
-            return new ArrayList<>();
-        }
-        return grammerErrorRepository.findAllById(idList);
     }
 
 }

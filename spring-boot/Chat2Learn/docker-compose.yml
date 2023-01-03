@@ -3,7 +3,6 @@ services:
   nginx:
     container_name: nginx
     image: nginx:1.13
-    restart: always
     ports:
       - "80:80"
       - "443:443"
@@ -18,7 +17,6 @@ services:
     build: ./
     ports:
       - "9092:9092"
-    restart: always
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresqldb:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres

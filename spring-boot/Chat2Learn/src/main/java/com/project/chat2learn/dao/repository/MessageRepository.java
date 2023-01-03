@@ -1,5 +1,6 @@
 package com.project.chat2learn.dao.repository;
 
+import com.project.chat2learn.common.enums.SenderType;
 import com.project.chat2learn.dao.domain.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +13,10 @@ public interface MessageRepository extends JpaRepository<Message, Long>{
 
     Page<Message> findAllByChatSessionId(Long id,Pageable pageable);
 
-    List<Message> findAllByChatSessionId(Long id);
+    List<Message> findAllByChatSessionIdAndSenderType(Long id,SenderType senderType);
 
-    List<Message> findAllByChatSessionPersonId(Long id);
+    List<Message> findAllByChatSessionPersonIdAndSenderType(Long id,SenderType senderType);
+
+    Page<Message> findAllByChatSessionPersonIdAndSenderTypeAndReportErrorsCode(Long id, SenderType senderType, String code, Pageable pageable);
 
 }

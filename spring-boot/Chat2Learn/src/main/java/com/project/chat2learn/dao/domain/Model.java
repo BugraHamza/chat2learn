@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Model extends Auditable {
+public class Model {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,6 +24,8 @@ public class Model extends Auditable {
     private Long id;
 
     private String name;
+
+    private String description;
 
     @OneToMany(mappedBy="model",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private Set<ChatSession> sessions =  new HashSet<>();

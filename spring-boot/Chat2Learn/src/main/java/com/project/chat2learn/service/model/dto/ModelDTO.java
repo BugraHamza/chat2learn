@@ -17,4 +17,5 @@ public class ModelDTO implements Serializable {
     private final LocalDateTime lastModifiedDate;
     private final Long id;
     private final String name;
+    private final String description;
 }

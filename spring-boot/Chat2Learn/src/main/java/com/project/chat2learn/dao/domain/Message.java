@@ -26,7 +26,10 @@ public class Message extends Auditable {
     @JoinColumn(name = "chat_session_id")
     private ChatSession chatSession;
 
+    @Column(length = 1000)
     private String text;
+
+    private Double score;
 
     @Enumerated(EnumType.STRING)
     private SenderType senderType;

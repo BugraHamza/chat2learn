@@ -1,12 +1,10 @@
 package com.project.chat2learn.service.model.dto;
 
-import com.project.chat2learn.dao.domain.GrammerError;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A DTO for the {@link com.project.chat2learn.dao.domain.Report} entity
@@ -19,5 +17,6 @@ public class ReportDTO implements Serializable {
     private final LocalDateTime lastModifiedDate;
     private final Long id;
     private final String correctText;
-    private final List<GrammerErrorDTO> errors;
+    private final String taggedCorrectText;
+    private final List<ReportErrorDTO> errors;
 }

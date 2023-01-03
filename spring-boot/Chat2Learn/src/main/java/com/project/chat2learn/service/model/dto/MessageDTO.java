@@ -17,6 +17,7 @@ public class MessageDTO implements Serializable {
     private final LocalDateTime lastModifiedDate;
     private final Long id;
     private final String text;
+    private final Double score;
     private final SenderType senderType;
     private final ReportDTO report;
 }

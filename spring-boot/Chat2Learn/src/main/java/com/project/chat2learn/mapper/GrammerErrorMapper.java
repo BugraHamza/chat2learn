@@ -1,15 +1,15 @@
 package com.project.chat2learn.mapper;
 
-import com.project.chat2learn.dao.domain.GrammerError;
-import com.project.chat2learn.service.model.dto.GrammerErrorDTO;
+import com.project.chat2learn.dao.domain.ReportError;
+import com.project.chat2learn.service.model.dto.ReportErrorDTO;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface GrammerErrorMapper {
-    GrammerError grammerErrorDTOToGrammerError(GrammerErrorDTO grammerErrorDTO);
+    ReportError grammerErrorDTOToGrammerError(ReportErrorDTO reportErrorDTO);
 
-    GrammerErrorDTO grammerErrorToGrammerErrorDTO(GrammerError grammerError);
+    ReportErrorDTO grammerErrorToGrammerErrorDTO(ReportError reportError);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    GrammerError updateGrammerErrorFromGrammerErrorDTO(GrammerErrorDTO grammerErrorDTO, @MappingTarget GrammerError grammerError);
+    ReportError updateGrammerErrorFromGrammerErrorDTO(ReportErrorDTO reportErrorDTO, @MappingTarget ReportError reportError);
 }

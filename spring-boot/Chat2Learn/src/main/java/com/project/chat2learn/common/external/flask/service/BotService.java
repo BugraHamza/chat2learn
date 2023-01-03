@@ -1,9 +1,13 @@
 package com.project.chat2learn.common.external.flask.service;
 
-import com.project.chat2learn.common.external.flask.model.response.BaseResponse;
-import org.springframework.security.core.Authentication;
+import com.project.chat2learn.common.external.flask.model.response.ChatBotResponse;
+import com.project.chat2learn.common.external.flask.model.response.GrammerCheckResponse;
+
+import java.util.concurrent.CompletableFuture;
 
 public interface BotService {
 
-    BaseResponse messageBotWithId(Long id, String message);
+    CompletableFuture<GrammerCheckResponse> checkGrammer(String message);
+
+    CompletableFuture<ChatBotResponse> messageBot(Long id,String message);
 }

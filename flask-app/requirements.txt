@@ -9,7 +9,6 @@ filelock==3.8.0
 Flask==2.2.2
 fsspec==2022.10.0
 fuzzywuzzy==0.18.0
-gramformer==1.0
 huggingface-hub==0.10.1
 idna==3.4
 itsdangerous==2.1.2
@@ -39,4 +38,4 @@ typing_extensions==4.4.0
 urllib3==1.26.12
 wasabi==0.10.1
 Werkzeug==2.2.2
-git+https://github.com/PrithivirajDamodaran/Gramformer.git
+huggingface-hub==0.10.1

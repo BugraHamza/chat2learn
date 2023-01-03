@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,5 +16,9 @@ public class ReportDetailDTO {
 
     private Long errorCount;
 
-    private Map<GrammerErrorDTO,Long> grammerErrorMap;
+    private Double averageScore;
+
+    private List<ReportErrorCountDTO> reportErrorCountDTOList;
+
+    private Map<LocalDate,Double> scoreMap;
 }
