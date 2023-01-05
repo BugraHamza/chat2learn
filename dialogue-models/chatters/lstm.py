@@ -81,7 +81,7 @@ class LSTMChatter(BaseChatter):
 
 
 if __name__ == '__main__':
-    lstm_chatter = LSTMChatter(model_path='../saved models/lstm_model/lstm_model_last.pt',
+    lstm_chatter = LSTMChatter(model_path='../saved models/lstm-models/Model_50.pt',
                                tokenizer_path='../saved models/lstm_model/lstm_tokenizer.pth')
 
     states = None
