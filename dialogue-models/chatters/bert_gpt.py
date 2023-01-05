@@ -51,7 +51,7 @@ class Seq2SeqModel:
 
     def answer(self, sent):
         with torch.no_grad():
-            tokenized_sent = self.bert_tokenizer(sent, padding='max_length',
+            tokenized_sent = self.bert_tokenizer(sent, #padding='max_length',
                                                  truncation=True, return_tensors='pt')
             tokenized_ans = self.gpt_tokenizer(self.gpt_tokenizer.bos_token, return_tensors='pt')
 
@@ -59,15 +59,12 @@ class Seq2SeqModel:
             tokenized_ans = {k: v.to(self.gpt_model.device) for k, v in tokenized_ans.items()}
 
             bert_out = self.bert_model(**tokenized_sent)
-            gpt_out = self.gpt_model.generate(**tokenized_ans, max_new_tokens=30, temperature=0.8, num_beams=7,
+            gpt_out = self.gpt_model.generate(**tokenized_ans, max_new_tokens=100, temperature=0.8, num_beams=7,
                                               no_repeat_ngram_size=3, early_stopping=True, do_sample=True,
-                                              num_return_sequences=1, top_k=50, top_p=0.95,
-                                              bos_token_id=self.gpt_tokenizer.bos_token_id,
-                                              pad_token_id=self.gpt_tokenizer.pad_token_id,
-                                              eos_token_id=self.gpt_tokenizer.eos_token_id,
+                                              num_return_sequences=1, top_k=50, top_p=.95,
                                               encoder_hidden_states=bert_out.last_hidden_state)
 
-            return self.gpt_tokenizer.decode(gpt_out[0])
+            return self.gpt_tokenizer.decode(gpt_out[0], skip_special_tokens=True)
 
     def save(self, model_dir):
         os.makedirs(model_dir, exist_ok=True)
@@ -99,7 +96,7 @@ class BertGptChatter(BaseChatter):
 
 
 if __name__ == '__main__':
-    bert_gpt_model = BertGptChatter(model_path='../saved models/bert_gpt_model')
+    bert_gpt_model = BertGptChatter(model_path='../saved models/bert_gpt2-models/bert_gpt2_epoch_3')
 
     while True:
         sent = input("You: ")

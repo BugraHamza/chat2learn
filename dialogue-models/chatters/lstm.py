@@ -69,7 +69,6 @@ class LSTMChatter(BaseChatter):
     def chat(self, text: str, states=None) -> str:
         tokenized_text = self.tokenize(text)
         tokens, states = beam_search(self.model, tokenized_text, num_beams=3, max_new_token=30,
-                                     bos_token_id=self.vocab[self.special_tokens['bos_token']],
                                      eos_token_id=self.vocab[self.special_tokens['eos_token']],
                                      states=states)
         return self.detokenize(tokens), states
@@ -80,10 +79,7 @@ if __name__ == '__main__':
                                tokenizer_path='../saved models/lstm-models/lstm-tokenizer.pth')
 
     states = None
-    i = 0
     while True:
         sent = input("You: ")
         ans, states = lstm_chatter.chat(sent, states=states)
         print(f'Lissy: {ans}')
-
-        i += 1

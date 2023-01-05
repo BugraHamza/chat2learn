@@ -13,7 +13,7 @@ class GPTChatter(BaseChatter):
         self.model = AutoModelForCausalLM.from_pretrained(self.model_path)
 
     def chat(self, text: str, hidden_states: torch.Tensor):
-        text_len = 2 + len(text)
+        text_len = 1 + len(text)
         text = self.tokenizer.bos_token + text
         tok_text = self.tokenizer(text, return_tensors='pt')
         gpt_output = self.model.generate(**tok_text, max_new_tokens=50, num_beams=7, temperature=0.8,
@@ -33,10 +33,10 @@ class GPTChatter(BaseChatter):
 
 
 if __name__ == '__main__':
-    galip = GPTChatter(model_path='../saved models/gpt_model')
+    galip = GPTChatter(model_path='../saved models/gpt2-models/gpt_epoch_4')
 
+    hidden_states = None
     while True:
-        hidden_states = None
         sent = input("You: ")
         ans, hidden_states = galip.chat(sent, hidden_states=hidden_states)
         print('Gabriel Tee: ', ans)
