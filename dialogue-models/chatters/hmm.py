@@ -6,7 +6,6 @@ from nltk.tag.hmm import HiddenMarkovModelTagger
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 from base_utils import BaseModel, BaseChatter
 
-
 class HiddenMarkovModel(BaseModel):
     def __init__(self, tokenizer_name, max_len, special_tokens, **kwargs):
         super().__init__()
@@ -89,9 +88,13 @@ class HMMChatter(BaseChatter):
 if __name__ == '__main__':
     max_length = 50
     special_tokens = {'bos_token': '|BOS|', 'eos_token': '|EOS|', 'pad_token': '|PAD|', 'unk_token': '|UNK|'}
-
+    lst = time.time()
     hmm_chatter = HMMChatter(tokenizer_name='spacy', max_len=max_length, special_tokens=special_tokens)
-
+    lst = time.time() - lst
+    print(f'Loaded in {lst} seconds')
     while True:
         text = input('You: ')
+        ist = time.time()
         print('Hans Markow:', hmm_chatter.chat(text))
+        ist = time.time() - ist
+        print(f'Inference time: {ist:.2f} seconds')

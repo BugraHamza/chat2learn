@@ -40,9 +40,10 @@ class _ReportPageState extends State<ReportPage> {
             .map((e) => ChartData(e.code!, e.count!.toDouble()))
             .toList();
         _reportErrorCountDTOList = reportDetailDTO.reportErrorCountDTOList!;
-        _errorRate =
-            ((reportDetailDTO.errorCount! / reportDetailDTO.messageCount!) *
-                100);
+        _errorRate = reportDetailDTO.messageCount! != 0
+            ? ((reportDetailDTO.errorCount! / reportDetailDTO.messageCount!) *
+                100)
+            : 0;
         _score = reportDetailDTO.averageScore!;
       });
     } catch (e) {
@@ -140,27 +141,38 @@ class _ReportPageState extends State<ReportPage> {
             FadeAnimation(
               2.0,
               Container(
-                child: SfCircularChart(
-                  title: ChartTitle(text: 'Most common mistake'),
-                  legend: Legend(
-                      position: LegendPosition.bottom,
-                      isVisible: true,
-                      overflowMode: LegendItemOverflowMode.wrap),
-                  series: <CircularSeries>[
-                    // Render pie chart
-                    PieSeries<ChartData, String>(
-                        dataSource: chartData,
-                        enableTooltip: true,
-                        dataLabelSettings:
-                            const DataLabelSettings(isVisible: true),
-                        pointColorMapper: (ChartData data, _) => data.color,
-                        xValueMapper: (ChartData data, _) => data.x,
-                        yValueMapper: (ChartData data, _) => data.y)
-                  ],
-                ),
+                child: chartData.isEmpty
+                    ? const Center(
+                        child: Text("No data to display"),
+                      )
+                    : SfCircularChart(
+                        title: ChartTitle(text: 'Most common mistake'),
+                        legend: Legend(
+                            position: LegendPosition.bottom,
+                            isVisible: true,
+                            overflowMode: LegendItemOverflowMode.wrap),
+                        series: <CircularSeries>[
+                          // Render pie chart
+                          PieSeries<ChartData, String>(
+                              dataSource: chartData,
+                              enableTooltip: true,
+                              dataLabelSettings:
+                                  const DataLabelSettings(isVisible: true),
+                              pointColorMapper: (ChartData data, _) =>
+                                  data.color,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y)
+                        ],
+                      ),
               ),
             ),
-            ...getErrorTypes(_reportErrorCountDTOList)
+            getErrorTypes(_reportErrorCountDTOList).isEmpty
+                ? const Center(
+                    child: Text("No data to display"),
+                  )
+                : Column(
+                    children: getErrorTypes(_reportErrorCountDTOList),
+                  ),
           ]),
         ),
       ],

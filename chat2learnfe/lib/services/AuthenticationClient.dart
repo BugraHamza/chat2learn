@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 
 class AuthenticationClient {
   static final baseURL =
-      "${sharedPrefs.ip ?? "http://${Platform.isIOS ? "localhost" : "10.0.2.2"}:9092/auth"}";
+      "${sharedPrefs.ip ?? "http://${Platform.isIOS ? "localhost" : "10.0.2.2"}:9092"}/auth";
 
   static Map<String, String> addHeaders() {
     Map<String, String> headers = {};
@@ -22,6 +22,7 @@ class AuthenticationClient {
 
   static Future<LoginResponse> login(LoginRequest loginRequest) async {
     var url = Uri.parse(baseURL);
+    print(baseURL);
     var response = await http.post(url,
         body: jsonEncode(loginRequest.toJson()), headers: addHeaders());
     if (response.statusCode == 200) {

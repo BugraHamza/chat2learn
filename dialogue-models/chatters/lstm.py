@@ -23,7 +23,7 @@ class LstmModel(nn.Module):
                             dropout=dropout_rate, batch_first=True)
         self.fc = nn.Linear(self.n_hidden, self.vocab_size)
         self.softmax = nn.LogSoftmax(dim=-1)
-
+        
         self.dropout = nn.Dropout(dropout_rate)
 
     def forward(self, x, states=None):
@@ -31,7 +31,7 @@ class LstmModel(nn.Module):
         out, states = self.lstm(out, states)
         out = self.fc(out)
         out = self.softmax(out)
-
+        
         return out, states
 
     def init_states(self, batch_size, device):
@@ -39,6 +39,8 @@ class LstmModel(nn.Module):
         c = torch.zeros((self.n_layers, batch_size, self.n_hidden), device=device)
 
         return (h, c)
+
+
 
 
 class LSTMChatter(BaseChatter):

@@ -1,21 +1,23 @@
 import re
 
 error_dict: dict = {
-    "VERB:SVA": "Özneyle eylem arasında uyumsuzluk",
-    "ORTH": "Yazım yanlışı",
-    "PUNCT": "Noktalama işareti",
-    "DET": "Sıfat",
+    "VERB:SVA": "Ozneyle eylem arasinda uyumsuzluk var",
+    "ORTH": "Yazim yanlişi",
+    "PUNCT": "Noktalama işareti hatası",
+    "DET": "Belirleyici hatası. ",
     "ADJ": "Sıfat",
-    "NOUN": "İsim",
-    "PRON": "Zarf",
-    "ADV": "Sıfat",
+    "PRON": "Zamir hatası",
+    "ADV": "Zarf",
+    "VERB": "Fiil hatası",
     "NUM": "Sayı",
     "CONJ": "Bağlaç",
-    "AUX": "Yardımcı fiil",
-    "INTJ": "Ünlem",
-    "PART": "Zarf",
     "WO": "Kelime sırası yanlışı",
-    "NOUN:POSS": "Görünüşe göre bu isim formu yanlış olabilir."
+    "NOUN:POSS": "Görünüşe göre bu isim formu yanlış olabilir.",
+    "SPELL":"Yazım Yanlışı",
+    "OTHER":"Diğer",
+    "VERB:FORM":"Fiil biçimi yanlışı",
+    "NOUN:NUM":"İsim sayı yanlışı",
+    "PREP":"Eksik ya da fazla prepozisyon kullanımı",
     
 }
 
@@ -44,7 +46,7 @@ def get_error_types(highlighted_text):
         try:
             error_type_list.append({"code":error_type,"description":error_dict[error_type]})
         except:
-            error_type_list.append({"code":error_type,"description":"Unknown error type"})
+            error_type_list.append({"code":error_type,"description":"Belirsiz hata tipi"})
     return error_type_list
 
 

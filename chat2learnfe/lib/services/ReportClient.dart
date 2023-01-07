@@ -26,7 +26,8 @@ class ReportClient {
     var url = Uri.parse(baseURL);
     var response = await http.get(url, headers: addHeaders());
     if (response.statusCode == 200) {
-      return ReportDetailDTO.fromJson(json.decode(response.body));
+      return ReportDetailDTO.fromJson(
+          json.decode(utf8.decode(response.bodyBytes)));
     } else {
       throw Exception(
           ErrorResponseDTO.fromJson(json.decode(response.body)).message);

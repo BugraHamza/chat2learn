@@ -1,4 +1,6 @@
 import math
+import difflib
+import string
 class Gramformer:
 
   def __init__(self, models=1, use_gpu=False):
@@ -76,7 +78,6 @@ class Gramformer:
 
   def highlight(self, orig, cor):
       edits = self._get_edits(orig, cor)
-      print(edits)
       orig_tokens = orig.split()
 
       ignore_indexes = []
@@ -127,15 +128,23 @@ class Gramformer:
         orig = self.annotator.parse(orig)
         cor = self.annotator.parse(cor)
         alignment = self.annotator.align(orig, cor)
+        print("Alignment : ",alignment)
         edits = self.annotator.merge(alignment)
-
         if len(edits) == 0:  
             return []
-
         edit_annotations = []
         for e in edits:
             e = self.annotator.classify(e)
-            edit_annotations.append((e.type[2:], e.o_str, e.o_start, e.o_end,  e.c_str, e.c_start, e.c_end))
+            if(abs(len(e.o_str)-len(e.c_str)) == 1):
+                for i,s in enumerate(difflib.ndiff(e.o_str,e.c_str)):
+                    if s[0]==' ': continue
+                    elif s[0]=='-':
+                        if s[-1] in string.punctuation:
+                            e.type = "R:PUNCT"
+                    elif s[0]=='+':
+                        if s[-1] in string.punctuation:  
+                            e.type = "I:PUNCT"
+            edit_annotations.append((e.type[2:] , e.o_str, e.o_start, e.o_end,  e.c_str, e.c_start, e.c_end))
                 
         if len(edit_annotations) > 0:
             return edit_annotations

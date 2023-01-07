@@ -44,3 +44,8 @@ def check_grammer(text):
             grammerResponse.taggedText = reponse_text
             grammerResponse.errorTypes = error_types
     return grammerResponse
+
+
+#check_grammer("Did you watched the tv show yesterdday?")
+
+#check_grammer("Which moie are you going to watch")

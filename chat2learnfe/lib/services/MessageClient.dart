@@ -28,7 +28,8 @@ class MessageClient {
     var url = Uri.parse("$baseURL/$chatSessionId/message?page=$page");
     var response = await http.get(url, headers: addHeaders());
     if (response.statusCode == 200) {
-      return GetMessagesResponse.fromJson(json.decode(response.body));
+      return GetMessagesResponse.fromJson(
+          json.decode(utf8.decode(response.bodyBytes)));
     } else {
       throw Exception(
           ErrorResponseDTO.fromJson(json.decode(response.body)).message);
@@ -41,7 +42,8 @@ class MessageClient {
     var response = await http.post(url,
         body: jsonEncode(sendMessageRequest.toJson()), headers: addHeaders());
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return SendMessageResponse.fromJson(json.decode(response.body));
+      return SendMessageResponse.fromJson(
+          json.decode(utf8.decode(response.bodyBytes)));
     } else {
       throw Exception(
           ErrorResponseDTO.fromJson(json.decode(response.body)).message);
