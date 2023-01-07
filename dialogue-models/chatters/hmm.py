@@ -80,7 +80,7 @@ class HMMChatter(BaseChatter):
 
     def chat(self, text: str) -> str:
         pred = self.model.predict(text)
-        # tokens = self.model.vocab.lookup_tokens(pred)
+        tokens = self.model.vocab.lookup_tokens(pred)
         filtered_tokens = list(filter(lambda x: x not in self.model.special_tokens.values(), tokens))
         return self.detokenizer.detokenize(filtered_tokens)
 
@@ -88,13 +88,8 @@ class HMMChatter(BaseChatter):
 if __name__ == '__main__':
     max_length = 50
     special_tokens = {'bos_token': '|BOS|', 'eos_token': '|EOS|', 'pad_token': '|PAD|', 'unk_token': '|UNK|'}
-    lst = time.time()
     hmm_chatter = HMMChatter(tokenizer_name='spacy', max_len=max_length, special_tokens=special_tokens)
-    lst = time.time() - lst
-    print(f'Loaded in {lst} seconds')
+
     while True:
         text = input('You: ')
-        ist = time.time()
         print('Hans Markow:', hmm_chatter.chat(text))
-        ist = time.time() - ist
-        print(f'Inference time: {ist:.2f} seconds')
