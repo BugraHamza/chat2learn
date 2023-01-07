@@ -22,8 +22,10 @@ class GrammerResponse:
 def check_grammer(text):
     grammerResponse = GrammerResponse(None, None,None,None)
     influent_sentences=[text]
+    print ("-"*100)
     for influent_sentence in influent_sentences:
         corrected_sentence_set = gf.correct(influent_sentence, max_candidates=42)
+        print ("[Input Sentence] ", influent_sentence)
         print("[Corrected Sentence Set] ", corrected_sentence_set)
         corrected_sentence = list(corrected_sentence_set)[0]
         references = [list(corrected_sentence_set)]
@@ -43,6 +45,8 @@ def check_grammer(text):
             grammerResponse.correctedSentence = corrected_sentence
             grammerResponse.taggedText = reponse_text
             grammerResponse.errorTypes = error_types
+    print ("-"*100)
+
     return grammerResponse
 
 

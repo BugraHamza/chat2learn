@@ -58,9 +58,10 @@ class Seq2SeqModel:
             tokenized_ans = {k: v.to(self.gpt_model.device) for k, v in tokenized_ans.items()}
 
             bert_out = self.bert_model(**tokenized_sent)
-            gpt_out = self.gpt_model.generate(**tokenized_ans, max_new_tokens=30, temperature=1, num_beams=1,
-                                              no_repeat_ngram_size=3, early_stopping=True, do_sample=False,
-                                              num_return_sequences=1, top_k=70, top_p=.95,
+            gpt_out = self.gpt_model.generate(**tokenized_ans, max_new_tokens=30, temperature=0.9, num_beams=2,
+                                                pad_token_id=self.gpt_tokenizer.pad_token_id,
+                                              no_repeat_ngram_size=3, early_stopping=True, do_sample=True,
+                                              num_return_sequences=1, top_k=40, top_p=.75,
                                               encoder_hidden_states=bert_out.last_hidden_state)
 
             return self.gpt_tokenizer.decode(gpt_out[0], skip_special_tokens=True)
@@ -97,6 +98,10 @@ sentence_df = pd.read_excel('~/Downloads/Rouge Sentences.xlsx')
     
 if __name__ == '__main__':
     bert_gpt_model = BertGptChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/bert_gpt2_epoch_6')
+
+    while True:
+            text = input('You: ')
+            print('Bert GPT:', bert_gpt_model.chat(text))
 
     for index, sent in enumerate(sentence_df['Sentences']):   
         print(sent)

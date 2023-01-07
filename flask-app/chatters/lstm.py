@@ -49,7 +49,6 @@ class LSTMChatter(BaseChatter):
         self.tokenizer = get_tokenizer('spacy')
         self.detokenizer = TreebankWordDetokenizer()
         self.vocab = torch.load(tokenizer_path)
-
         self.model = torch.load(self.model_path, map_location='cpu')
 
         self.model.eval()
@@ -75,10 +74,7 @@ class LSTMChatter(BaseChatter):
                                      states=states)
         return self.detokenize(tokens), states
 
-
 if __name__ == '__main__':
-    lstm_chatter = LSTMChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/lstm/lstm_model12.pt',
-                               tokenizer_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/lstm/lstm-tokenizer.pth')
 
     while True:
         states = None

@@ -6,7 +6,6 @@ from nltk.tag.hmm import HiddenMarkovModelTagger
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 from .base_utils import BaseModel, BaseChatter
 
-
 class HiddenMarkovModel(BaseModel):
     def __init__(self, tokenizer_name, max_len, special_tokens, **kwargs):
         super().__init__()
@@ -81,14 +80,17 @@ class HMMChatter(BaseChatter):
 
     def chat(self, text: str) -> str:
         pred = self.model.predict(text)
-        # tokens = self.model.vocab.lookup_tokens(pred)
-        filtered_tokens = list(filter(lambda x: x not in self.model.special_tokens.values(), pred))
+        tokens = self.model.vocab.lookup_tokens(pred)
+        filtered_tokens = list(filter(lambda x: x not in self.model.special_tokens.values(), tokens))
         return self.detokenizer.detokenize(filtered_tokens)
 
+max_length = 50
 
+special_tokens = {'bos_token': '|BOS|', 'eos_token': '|EOS|', 'pad_token': '|PAD|', 'unk_token': '|UNK|'}
+
+hmm_chatter = HMMChatter(tokenizer_name='spacy', max_len=max_length, special_tokens=special_tokens)
 if __name__ == '__main__':
     import time
-    max_length = 50
     special_tokens = {'bos_token': '|BOS|', 'eos_token': '|EOS|', 'pad_token': '|PAD|', 'unk_token': '|UNK|'}
     lst = time.time()
     hmm_chatter = HMMChatter(tokenizer_name='spacy', max_len=max_length, special_tokens=special_tokens)

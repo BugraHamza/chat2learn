@@ -128,7 +128,6 @@ class Gramformer:
         orig = self.annotator.parse(orig)
         cor = self.annotator.parse(cor)
         alignment = self.annotator.align(orig, cor)
-        print("Alignment : ",alignment)
         edits = self.annotator.merge(alignment)
         if len(edits) == 0:  
             return []
