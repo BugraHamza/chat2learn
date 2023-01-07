@@ -31,8 +31,9 @@ class HiddenMarkovModel(BaseModel):
             sent1 += [special_tokens['pad_token']] * (self.max_len - len(sent1))
             sent2 += [special_tokens['pad_token']] * (self.max_len - len(sent2))
 
-            sentences1.append(sent1)
-            sentences2.append(sent2)
+            if sent1 not in sentences1 and sent2 not in sentences2:
+                sentences1.append(sent1)
+                sentences2.append(sent2)
 
         return {'sent1': sentences1, 'sent2': sentences2}
 
@@ -80,7 +81,7 @@ class HMMChatter(BaseChatter):
 
     def chat(self, text: str) -> str:
         pred = self.model.predict(text)
-        tokens = self.model.vocab.lookup_tokens(pred)
+        # tokens = self.model.vocab.lookup_tokens(pred)
         filtered_tokens = list(filter(lambda x: x not in self.model.special_tokens.values(), tokens))
         return self.detokenizer.detokenize(filtered_tokens)
 
