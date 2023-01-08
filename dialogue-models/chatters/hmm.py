@@ -82,14 +82,19 @@ class HMMChatter(BaseChatter):
         pred = self.model.predict(text)
         tokens = self.model.vocab.lookup_tokens(pred)
         filtered_tokens = list(filter(lambda x: x not in self.model.special_tokens.values(), tokens))
+        print('INPUT LENGTH: ', len(tet.split()))
         return self.detokenizer.detokenize(filtered_tokens)
 
 
 if __name__ == '__main__':
+    from time import time
     max_length = 50
     special_tokens = {'bos_token': '|BOS|', 'eos_token': '|EOS|', 'pad_token': '|PAD|', 'unk_token': '|UNK|'}
     hmm_chatter = HMMChatter(tokenizer_name='spacy', max_len=max_length, special_tokens=special_tokens)
 
     while True:
         text = input('You: ')
-        print('Hans Markow:', hmm_chatter.chat(text))
+        start = time()
+        ans = hmm_chatter.chat(text)
+        print('Time taken: ', time() - start)
+        print('Hans Markow:', ans)

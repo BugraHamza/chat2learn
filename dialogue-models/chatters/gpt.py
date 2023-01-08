@@ -16,6 +16,7 @@ class GPTChatter(BaseChatter):
         text_len = 1 + len(text)
         text = self.tokenizer.bos_token + text
         tok_text = self.tokenizer(text, return_tensors='pt')
+        print('INPUT LENGTH: ', len(tok_text['input_ids'][0]))
         gpt_output = self.model.generate(**tok_text, max_new_tokens=50, num_beams=1, do_sample=False,)
 
         generated_text = self.tokenizer.decode(gpt_output[0], skip_special_tokens=True)[text_len:]
@@ -23,9 +24,12 @@ class GPTChatter(BaseChatter):
 
 
 if __name__ == '__main__':
+    from time import time
     galip = GPTChatter(model_path='../saved models/gpt2-models/gpt_epoch_4')
 
     while True:
         sent = input('You: ')
+        start = time()
         ans = galip.chat(sent)
+        print('Time: ', time() - start)
         print('Galip: ', ans)

@@ -60,6 +60,7 @@ class LSTMChatter(BaseChatter):
     def tokenize(self, text: str) -> List[str]:
         text = ' '.join([self.special_tokens['bos_token'], text, self.special_tokens['pad_token']])
         text = self.vocab(self.tokenizer(text))
+        print('INPUT LENGTH: ', len(text))
         return torch.tensor(text)
 
     def detokenize(self, tokens) -> str:
@@ -77,11 +78,14 @@ class LSTMChatter(BaseChatter):
 
 
 if __name__ == '__main__':
-    lstm_chatter = LSTMChatter(model_path='/home/sefa/Desktop/best-lstms/lstm_model_12.pt',
+    from time import time
+    lstm_chatter = LSTMChatter(model_path='../saved models/lstm-models/lstm_model12.pt',
                                tokenizer_path='../saved models/lstm-models/lstm-tokenizer.pth')
 
     states = None
     while True:
         sent = input("You: ")
+        start = time()
         ans, states = lstm_chatter.chat(sent, states=states)
+        print("Time: ", time() - start)
         print(f'Lissy: {ans}')
