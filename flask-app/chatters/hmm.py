@@ -89,17 +89,17 @@ max_length = 50
 special_tokens = {'bos_token': '|BOS|', 'eos_token': '|EOS|', 'pad_token': '|PAD|', 'unk_token': '|UNK|'}
 
 hmm_chatter = HMMChatter(tokenizer_name='spacy', max_len=max_length, special_tokens=special_tokens)
-if __name__ == '__main__':
-    import time
-    special_tokens = {'bos_token': '|BOS|', 'eos_token': '|EOS|', 'pad_token': '|PAD|', 'unk_token': '|UNK|'}
-    lst = time.time()
-    hmm_chatter = HMMChatter(tokenizer_name='spacy', max_len=max_length, special_tokens=special_tokens)
-    lst = time.time() - lst
+# if __name__ == '__main__':
+#     import time
+#     special_tokens = {'bos_token': '|BOS|', 'eos_token': '|EOS|', 'pad_token': '|PAD|', 'unk_token': '|UNK|'}
+#     lst = time.time()
+#     hmm_chatter = HMMChatter(tokenizer_name='spacy', max_len=max_length, special_tokens=special_tokens)
+#     lst = time.time() - lst
 
-    print('Time taken to load model: ', lst)
-    while True:
-        text = input('You: ')
-        ist = time.time()
-        print('Hans Markow:', hmm_chatter.chat(text))
-        ist = time.time() - ist
-        print('Time taken to predict: ', ist)
+#     print('Time taken to load model: ', lst)
+#     while True:
+#         text = input('You: ')
+#         ist = time.time()
+#         print('Hans Markow:', hmm_chatter.chat(text))
+#         ist = time.time() - ist
+#         print('Time taken to predict: ', ist)

@@ -142,8 +142,11 @@ class _ReportPageState extends State<ReportPage> {
               2.0,
               Container(
                 child: chartData.isEmpty
-                    ? const Center(
-                        child: Text("No data to display"),
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: const Center(
+                          child: Text("No data to display"),
+                        ),
                       )
                     : SfCircularChart(
                         title: ChartTitle(text: 'Most common mistake'),
@@ -166,13 +169,9 @@ class _ReportPageState extends State<ReportPage> {
                       ),
               ),
             ),
-            getErrorTypes(_reportErrorCountDTOList).isEmpty
-                ? const Center(
-                    child: Text("No data to display"),
-                  )
-                : Column(
-                    children: getErrorTypes(_reportErrorCountDTOList),
-                  ),
+            Column(
+              children: getErrorTypes(_reportErrorCountDTOList),
+            ),
           ]),
         ),
       ],
