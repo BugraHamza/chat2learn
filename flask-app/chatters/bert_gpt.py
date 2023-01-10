@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModel
-from base_utils import BaseChatter
+from .base_utils import BaseChatter
 import pandas as pd
 
 class Seq2SeqModel:
@@ -94,21 +94,21 @@ class BertGptChatter(BaseChatter):
     def chat(self, text: str):
         return self.seq2seq_model.answer(text)
 
-sentence_df = pd.read_excel('~/Downloads/Rouge Sentences.xlsx')
     
-if __name__ == '__main__':
-    bert_gpt_model = BertGptChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/bert_gpt2_epoch_6')
+# if __name__ == '__main__':
+#     bert_gpt_model = BertGptChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/bert_gpt2_epoch_6')
 
-    while True:
-            text = input('You: ')
-            print('Bert GPT:', bert_gpt_model.chat(text))
+#     while True:
+#             text = input('You: ')
+#             print('Bert GPT:', bert_gpt_model.chat(text))
 
-    for index, sent in enumerate(sentence_df['Sentences']):   
-        print(sent)
-        print(bert_gpt_model.seq2seq_model.gpt_model)
+#     for index, sent in enumerate(sentence_df['Sentences']):   
+#         print(sent)
+#         print(bert_gpt_model.seq2seq_model.gpt_model)
 
-        ans = bert_gpt_model.chat(sent)
-        sentence_df.at[index,"Bert-GPT Sentence" ] = ans
+#         ans = bert_gpt_model.chat(sent)
+#         sentence_df.at[index,"Bert-GPT Sentence" ] = ans
 
-    sentence_df.to_csv('~/Downloads/Rouge Sentences Bert-GPT.csv', index=False)
-    print(sentence_df) 
+#     sentence_df.to_csv('~/Downloads/Rouge Sentences Bert-GPT.csv', index=False)
+#     print(sentence_df) 
+

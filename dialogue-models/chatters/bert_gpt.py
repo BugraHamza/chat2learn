@@ -62,7 +62,7 @@ class Seq2SeqModel:
             gpt_out = self.gpt_model.generate(**tokenized_ans, max_new_tokens=30, num_beams=1, do_sample=False,
                                               encoder_hidden_states=bert_out.last_hidden_state)
 
-            return self.gpt_tokenizer.decode(gpt_out[0], skip_special_tokens=True)
+            return self.gpt_tokenizer.decode(gpt_out[0], skip_special_tokens=True) ,len(tokenized_sent['input_ids'][0])
 
     def save(self, model_dir):
         os.makedirs(model_dir, exist_ok=True)
@@ -95,9 +95,11 @@ class BertGptChatter(BaseChatter):
 
 if __name__ == '__main__':
     bert_gpt_model = BertGptChatter(model_path='../saved models/bert_gpt2-models/bert_gpt2_epoch_6')
-
+    from time import time
     while True:
         # Hi, Mr. Smith. I'm Doctor Hawkins. Why are you here today?
         sent = input('You: ')
+        t = time()
         ans = bert_gpt_model.chat(sent)
+        print(f'Inference time: {time() - t} sec')
         print('Bot: ', ans)

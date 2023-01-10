@@ -9,9 +9,10 @@ from chatters.bert_gpt import BertGptChatter
 from chatters.lstm import LSTMChatter, LstmModel
 
 
+print("[INFO] LSTM Model Loading...")
 lstm_chatter = LSTMChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/lstm/lstm_model12.pt',
                                tokenizer_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/lstm/lstm-tokenizer.pth')
-
+print("[INFO] LSTM Model Loaded...")
 
 print("[INFO] BERT + GPT Model Loading...")
 bert_gpt_chatter = BertGptChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/bert_gpt2_epoch_6')

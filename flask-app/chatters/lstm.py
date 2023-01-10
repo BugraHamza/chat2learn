@@ -74,10 +74,10 @@ class LSTMChatter(BaseChatter):
                                      states=states)
         return self.detokenize(tokens), states
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-    while True:
-        states = None
-        sent = input("You: ")
-        ans , _ = lstm_chatter.chat(sent, states=states)
-        print(f'Lissy: {ans}')
+#     while True:
+#         states = None
+#         sent = input("You: ")
+#         ans , _ = lstm_chatter.chat(sent, states=states)
+#         print(f'Lissy: {ans}')
