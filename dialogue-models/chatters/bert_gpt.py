@@ -94,7 +94,7 @@ class BertGptChatter(BaseChatter):
 
 
 if __name__ == '__main__':
-    bert_gpt_model = BertGptChatter(model_path='../saved models/bert_gpt2-models/bert_gpt2_epoch_6')
+    bert_gpt_model = BertGptChatter(model_path='../saved models/bert_gpt2-models/bert_gpt2_epoch_15')
 
     while True:
         # Hi, Mr. Smith. I'm Doctor Hawkins. Why are you here today?
