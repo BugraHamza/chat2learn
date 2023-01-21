@@ -6,7 +6,7 @@ class Gramformer:
   def __init__(self, models=1, use_gpu=False):
     from transformers import AutoTokenizer
     from transformers import AutoModelForSeq2SeqLM
-    #from lm_scorer.models.auto import AutoLMScorer as LMScorer
+    #from lm_scorer.trainers.auto import AutoLMScorer as LMScorer
     import errant
     self.annotator = errant.load('en')
     

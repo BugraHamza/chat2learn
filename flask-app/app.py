@@ -10,16 +10,16 @@ from chatters.lstm import LSTMChatter, LstmModel
 
 
 print("[INFO] LSTM Model Loading...")
-lstm_chatter = LSTMChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/lstm/lstm_model12.pt',
-                               tokenizer_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/lstm/lstm-tokenizer.pth')
+lstm_chatter = LSTMChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-trainers/trained_models/lstm/lstm_model12.pt',
+                               tokenizer_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-trainers/trained_models/lstm/lstm-tokenizer.pth')
 print("[INFO] LSTM Model Loaded...")
 
 print("[INFO] BERT + GPT Model Loading...")
-bert_gpt_chatter = BertGptChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/bert_gpt2_epoch_6')
+bert_gpt_chatter = BertGptChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-trainers/trained_models/bert_gpt2_epoch_6')
 print("[INFO] BERT + GPT Model Loaded...")
 
 print("[INFO] GPT Model Loading...")
-gpt_chatter = GPTChatter(model_path='../dialogue-models/trained_models/gpt_epoch_4')
+gpt_chatter = GPTChatter(model_path='../dialogue_models/trained_models/gpt_epoch_4')
 print("[INFO] GPT Model Loaded...")
 
 

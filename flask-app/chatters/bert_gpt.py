@@ -96,7 +96,7 @@ class BertGptChatter(BaseChatter):
 
     
 # if __name__ == '__main__':
-#     bert_gpt_model = BertGptChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-models/trained_models/bert_gpt2_epoch_6')
+#     bert_gpt_model = BertGptChatter(model_path='/Users/sefagokceoglu/workspace/c2l/chat2learn/dialogue-trainers/trained_models/bert_gpt2_epoch_6')
 
 #     while True:
 #             text = input('You: ')
