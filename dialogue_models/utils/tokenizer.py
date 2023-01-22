@@ -1,11 +1,11 @@
 import pickle
-
+import torch
 from nltk.tokenize.treebank import TreebankWordTokenizer, TreebankWordDetokenizer
 
 
 class CustomTokenizer:
     def __init__(self, tokenize_fn=None, detokenize_fn=None, bos_token=None,
-                 eos_token=None, pad_token=None, unk_token=None):
+                 eos_token=None, pad_token=None, unk_token=None, ):
         self.w2i = {}
         self.i2w = {}
 
@@ -17,7 +17,7 @@ class CustomTokenizer:
         self.pad_token = pad_token
         self.unk_token = unk_token
 
-    def tokenize(self, x, y=None):
+    def tokenize(self, x, y=None, **kwargs):
         tokenized_x = self._tokenizer(x)
         if y is not None:
             tokenized_y = self._tokenizer(y)
@@ -29,9 +29,13 @@ class CustomTokenizer:
         if self.eos_token is not None:
             tokenized_x = tokenized_x + [self.eos_token]
 
-        return [self.w2i.get(token, self.unk_token) for token in tokenized_x]
+        tokenized = self._pad(tokenized_x, kwargs.get('max_len', -1))
+        tokenized = [self.w2i.get(token, self.w2i[self.unk_token]) for token in tokenized]
+        return torch.tensor(tokenized, device=kwargs.get('device', 'cpu'))
 
     def detokenize(self, x):
+        if isinstance(x, torch.Tensor):
+            x = x.tolist()
         return self._detokenizer(map(self.i2w.get, x))
 
     def __len__(self):
@@ -41,6 +45,13 @@ class CustomTokenizer:
         if token not in self.w2i:
             self.w2i[token] = len(self.w2i)
             self.i2w[len(self.i2w)] = token
+
+    def _pad(self, x, max_len):
+        if max_len == -1:
+            return x
+        if len(x) > max_len:
+            return x[:max_len]
+        return x + [self.pad_token] * (max_len - len(x))
 
     def fit(self, texts):
         # add special tokens (bos, eos, pad, and unk)
@@ -62,8 +73,8 @@ class CustomTokenizer:
         with open(path, 'wb') as f:
             pickle.dump(self, f)
 
-    @classmethod
-    def from_pretrained(cls, path):
+    @staticmethod
+    def from_pretrained(path):
         try:
             with open(path, 'rb') as f:
                 return pickle.load(f)

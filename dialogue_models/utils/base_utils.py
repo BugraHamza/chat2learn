@@ -1,6 +1,7 @@
 from typing import List
 
 import torch
+from tqdm.auto import tqdm, trange
 
 
 class BaseChatter:
@@ -18,27 +19,38 @@ class BaseChatter:
 
 
 class BaseTrainer:
-    def __init__(self, model):
+    def __init__(self, model, device):
         self.model = model
+        self.device = device
 
     def model_forward(self, x):
         raise NotImplementedError('model_forward is not implemented and should be implemented in the child class')
 
     def fit(self, dataloader, epochs, **kwargs):
-        optimizer = kwargs['optimizer']
+        optimizer_fn = kwargs['optimizer']
+        learning_rate = kwargs.get('learning_rate', 0.001)
+        optimizer = optimizer_fn(self.model.parameters(), lr=learning_rate)
         criterion = kwargs['criterion']
-        metrics = kwargs['metrics']
+        metrics = kwargs.get('metrics', {})
 
         history = {'loss': []}
         for metric_name in metrics.keys():
             history[metric_name] = []
 
-        self.model.eval()
-        with torch.no_grad():
-            for x, y in dataloader:
+        self.model.train()
+        for epoch in range(epochs):
+            for batch in tqdm(dataloader, desc=f'Epoch #{epoch+1}/{epochs}', leave=False):
+                if len(batch) == 1:
+                    x = batch[0][:, :-1]
+                    y = batch[0][:, 1:]
+                elif len(batch) == 2:
+                    x, y = batch
+                else:
+                    raise ValueError('batch should have 1 or 2 elements')
+
                 optimizer.zero_grad()
                 y_pred = self.model_forward(x)
-                loss = criterion(y_pred, y)
+                loss = criterion(y_pred.moveaxis(1, -1), y)
                 loss.backward()
                 optimizer.step()
 
@@ -59,7 +71,7 @@ class BaseTrainer:
 
     def evaluate(self, dataloader, **kwargs):
         criterion = kwargs['criterion']
-        metrics = kwargs['metrics']
+        metrics = kwargs.get('metrics', {})
 
         history = {'loss': []}
         for metric_name in metrics.keys():
@@ -67,9 +79,17 @@ class BaseTrainer:
 
         self.model.eval()
         with torch.no_grad():
-            for x, y in dataloader:
+            for batch in tqdm(dataloader):
+                if len(batch) == 1:
+                    x = batch[0][:, :-1]
+                    y = batch[0][:, 1:]
+                elif len(batch) == 2:
+                    x, y = batch
+                else:
+                    raise ValueError('batch should have 1 or 2 elements')
+
                 y_pred = self.model_forward(x)
-                loss = criterion(y_pred, y)
+                loss = criterion(y_pred.moveaxis(1, -1), y)
                 history['loss'].append(loss.item())
                 for metric_name, metric in metrics.items():
                     history[metric_name].append(metric(y_pred, y))

@@ -6,8 +6,9 @@ from torchtext.data import get_tokenizer
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 
 from .base_utils import BaseChatter, beam_search
+from dialogue_models.trainers.train_lstm import LstmModel
 
-
+"""
 class LstmModel(nn.Module):
     def __init__(self, vocab_size, embed_dim=64, n_layers=32, n_hidden=128, dropout_rate=0.2):
         super(LstmModel, self).__init__()
@@ -39,7 +40,7 @@ class LstmModel(nn.Module):
         c = torch.zeros((self.n_layers, batch_size, self.n_hidden), device=device)
 
         return (h, c)
-
+"""
 
 class LSTMChatter(BaseChatter):
     def __init__(self, model_path, tokenizer_path):
