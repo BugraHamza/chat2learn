@@ -33,9 +33,12 @@ class CustomTokenizer:
         tokenized = [self.w2i.get(token, self.w2i[self.unk_token]) for token in tokenized]
         return torch.tensor(tokenized, device=kwargs.get('device', 'cpu'))
 
-    def detokenize(self, x):
+    def detokenize(self, x, skip_special_tokens=False):
         if isinstance(x, torch.Tensor):
             x = x.tolist()
+            if skip_special_tokens:
+                x = [tok for tok in x if tok not in [self.w2i[self.bos_token], self.w2i[self.eos_token],
+                                                        self.w2i[self.pad_token], self.w2i[self.unk_token]]]
         return self._detokenizer(map(self.i2w.get, x))
 
     def __len__(self):

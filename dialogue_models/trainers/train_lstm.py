@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Union
 
 import pandas as pd
-import torch
+
 import torch.nn as nn
 import torch.optim as optim
 
@@ -96,8 +96,9 @@ class LstmModel(nn.Module):
 
 class LSTMTrainer(BaseTrainer):
     def __init__(self, **kwargs):
+        super(LSTMTrainer, self).__init__(**kwargs)
         self.device = kwargs.get('device', 'cpu')
-        self.model = LstmModel(**kwargs).to(self.device)
+        self.model = kwargs['model'].to(self.device)
 
     def model_forward(self, x):
         return self.model(x)
@@ -116,20 +117,22 @@ class LSTMTrainer(BaseTrainer):
 if __name__ == '__main__':
     train_dataset = LSTMDataset('../dataset/processed_data/train_pairs.csv',
                                 '/Users/quimba/Desktop/chat2learn/dialogue_models/dataset/processed_data/tokenizer.pkl',
-                                max_len=100, device='cpu')
+                                max_len=100, device='mps')
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 
     val_dataset = LSTMDataset('../dataset/processed_data/validation_pairs.csv',
                                 '/Users/quimba/Desktop/chat2learn/dialogue_models/dataset/processed_data/tokenizer.pkl',
-                                max_len=100, device='cpu')
+                                max_len=100, device='mps')
     val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
+
+    model = LstmModel(vocab_size=len(train_dataset.tokenizer), pad_id=train_dataset.tokenizer.w2i[train_dataset.tokenizer.pad_token])
 
     tokenizer = train_dataset.tokenizer
     pad_id = tokenizer.w2i[tokenizer.pad_token]
-    trainer = LSTMTrainer(vocab_size=len(tokenizer), pad_id=pad_id, device='cpu')
-    #trainer.fit(train_loader, epochs=1, optimizer=optim.Adam, learning_rate=0.001,
-    #            criterion=nn.NLLLoss())
+    trainer = LSTMTrainer(model=model, criterion=nn.NLLLoss(),
+                          metrics=['rouge', 'bleu', 'meteor'], tokenizer=tokenizer, device='cpu')
+    trainer.fit(train_loader, epochs=1, optimizer=optim.Adam, learning_rate=0.001)
 
-    trainer.evaluate(val_loader, criterion=nn.NLLLoss())
+    trainer.evaluate(val_loader)
 
     trainer.save('lstm_model.pt')
