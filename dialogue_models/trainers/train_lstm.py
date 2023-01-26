@@ -116,23 +116,23 @@ class LSTMTrainer(BaseTrainer):
 
 if __name__ == '__main__':
     train_dataset = LSTMDataset('../dataset/processed_data/train_pairs.csv',
-                                '/Users/quimba/Desktop/chat2learn/dialogue_models/dataset/processed_data/tokenizer.pkl',
-                                max_len=100, device='mps')
-    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+                                '../dataset/processed_data/tokenizer.pkl',
+                                max_len=100, device='cuda')
+    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
 
     val_dataset = LSTMDataset('../dataset/processed_data/validation_pairs.csv',
-                                '/Users/quimba/Desktop/chat2learn/dialogue_models/dataset/processed_data/tokenizer.pkl',
-                                max_len=100, device='mps')
-    val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
-
-    model = LstmModel(vocab_size=len(train_dataset.tokenizer), pad_id=train_dataset.tokenizer.w2i[train_dataset.tokenizer.pad_token])
+                                '../dataset/processed_data/tokenizer.pkl',
+                                max_len=100, device='cuda')
+    val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False)
 
     tokenizer = train_dataset.tokenizer
     pad_id = tokenizer.w2i[tokenizer.pad_token]
+    model = LstmModel(vocab_size=len(tokenizer), pad_id=pad_id, embed_dim=128, n_layers=4, n_hidden=128, dropout_rate=0.2)
+
     trainer = LSTMTrainer(model=model, criterion=nn.NLLLoss(),
-                          metrics=['rouge', 'bleu', 'meteor'], tokenizer=tokenizer, device='cpu')
-    trainer.fit(train_loader, epochs=1, optimizer=optim.Adam, learning_rate=0.001)
+                          metrics=['rouge', 'bleu', 'meteor'], tokenizer=tokenizer, device='cuda')
+    #trainer.fit(train_loader, epochs=1, optimizer=optim.Adadelta, learning_rate=1)
 
     trainer.evaluate(val_loader)
 
-    trainer.save('lstm_model.pt')
+    #trainer.save('lstm_model.pt')

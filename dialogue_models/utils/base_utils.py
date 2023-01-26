@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 import torch
 from tqdm.auto import tqdm, trange
-from .util_func import get_metric
+from .metrics import get_metric
 
 
 class BaseChatter:
@@ -104,16 +104,17 @@ class BaseTrainer:
 
                 y_pred = self.model_forward(x)
                 loss = self.criterion(y_pred.moveaxis(1, -1), y)
-                history['loss'].append(loss.item())
 
                 # tokenize y and y_pred to get metrics
                 if self.tokenizer is not None:
                     y_pred = y_pred.argmax(dim=-1)
-                    y = self.tokenizer.detokenize(y)
-                    y_pred = self.tokenizer.detokenize(y_pred)
+                    y = [self.tokenizer.detokenize(sent, skip_special_tokens=True) for sent in y]
+                    y_pred = [self.tokenizer.detokenize(sent, skip_special_tokens=True) for sent in y_pred]
+
+                history['loss'].append(loss.item())
 
                 for metric_name, metric in self.metrics.items():
-                    history[metric_name].append(metric(predictions=y_pred, references=y))
+                    history[metric_name].append(metric(pred=y_pred, target=y))
 
                 # update progress bar postfix using the mean
                 postfix_dict = {'loss': np.mean(history['loss']), **{metric_name: np.mean(history[metric_name]) for metric_name in self.metrics.keys()}}
