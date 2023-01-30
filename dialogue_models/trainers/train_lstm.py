@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 from typing import Union
 
 import pandas as pd
@@ -12,6 +13,8 @@ from torch.utils.data import Dataset, DataLoader
 
 from dialogue_models.utils.base_utils import *
 from dialogue_models.utils.tokenizer import *
+
+import matplotlib.pyplot as plt
 
 
 class LSTMDataset(Dataset):
@@ -60,7 +63,7 @@ class LSTMDataset(Dataset):
 
 
 class LstmModel(nn.Module):
-    def __init__(self, vocab_size, embed_dim=64, n_layers=32, n_hidden=128, dropout_rate=0.2, **kwargs):
+    def __init__(self, vocab_size, embed_dim=128, n_layers=4, n_hidden=128, dropout_rate=0.2, **kwargs):
         super(LstmModel, self).__init__()
 
         self.n_layers = n_layers
@@ -114,25 +117,64 @@ class LSTMTrainer(BaseTrainer):
         script_model.save(path)
 
 
-if __name__ == '__main__':
-    train_dataset = LSTMDataset('../dataset/processed_data/train_pairs.csv',
-                                '../dataset/processed_data/tokenizer.pkl',
-                                max_len=100, device='cuda')
-    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+def train_lstm(train_path: str, tokenizer_path: str, **kwargs):
+    max_len = kwargs.get('max_len', 100)
+    device = kwargs.get('device', 'cpu')
+    batch_size = kwargs.get('batch_size', 8)
+    validation_path = kwargs.get('valset_path', None)
+    reduction_method = kwargs.get('reduction_method', 'mean')
+    metrics = kwargs.get('metrics', 'rouge')
+    model_path = kwargs.get('model_path', None)
+    model_kwargs = kwargs.get('model_kwargs', {})
 
-    val_dataset = LSTMDataset('../dataset/processed_data/validation_pairs.csv',
-                                '../dataset/processed_data/tokenizer.pkl',
-                                max_len=100, device='cuda')
-    val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False)
+    train_dataset = LSTMDataset(train_path,
+                                tokenizer_path,
+                                max_len=max_len, device=device)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
     tokenizer = train_dataset.tokenizer
     pad_id = tokenizer.w2i[tokenizer.pad_token]
-    model = LstmModel(vocab_size=len(tokenizer), pad_id=pad_id, embed_dim=128, n_layers=4, n_hidden=128, dropout_rate=0.2)
+    model = LstmModel(vocab_size=len(tokenizer), pad_id=pad_id, **model_kwargs)
 
     trainer = LSTMTrainer(model=model, criterion=nn.NLLLoss(),
-                          metrics=['rouge', 'bleu', 'meteor'], tokenizer=tokenizer, device='cuda')
-    #trainer.fit(train_loader, epochs=1, optimizer=optim.Adadelta, learning_rate=1)
+                          metrics=metrics, tokenizer=tokenizer, device=device)
 
-    trainer.evaluate(val_loader)
+    fitH = trainer.fit(train_loader, epochs=1, optimizer=optim.Adadelta, learning_rate=1)
 
-    #trainer.save('lstm_model.pt')
+    if validation_path is not None:
+        val_dataset = LSTMDataset(validation_path, tokenizer_path, max_len=max_len, device=device)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+        eval_H = trainer.evaluate(val_loader, reduction_method=reduction_method)
+
+    if model_path is not None:
+        trainer.save(model_path)
+
+    return fitH, eval_H
+
+
+if __name__ == '__main__':
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--train-path', type=str, required=True)
+    arg_parser.add_argument('--val-path', type=str, required=False)
+    arg_parser.add_argument('--tokenizer-path', type=str, required=True)
+    arg_parser.add_argument('--model-path', type=str, required=False)
+    arg_parser.add_argument('--max-len', type=int, required=False)
+    arg_parser.add_argument('--batch_size', type=int, required=False)
+    arg_parser.add_argument('--device', type=str, required=False)
+    arg_parser.add_argument('--fig-path', type=str, required=False)
+    arg_parser.add_argument('--reduction-method', type=str, required=False)
+    arg_parser.add_argument('--metrics', type=list, required=False)
+    arg_parser.add_argument('--embed-dim', type=int, required=False)
+    arg_parser.add_argument('--n-hidden', type=int, required=False)
+    arg_parser.add_argument('--n-layers', type=int, required=False)
+    arg_parser.add_argument('--dropout-rate', type=float, required=False)
+
+    args = arg_parser.parse_args()
+    print(vars(args))
+    fitH, eval_H = train_lstm(**vars(args))
+
+    if args.fig_path is not None:
+        plt.plot(fitH, 'r', label='Training')
+        plt.plot(eval_H, 'b', label='Validation')
+        plt.legend()
+        plt.savefig(args.fig_path)
