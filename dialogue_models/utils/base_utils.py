@@ -21,11 +21,12 @@ class BaseChatter:
 
 
 class BaseTrainer:
-    def __init__(self, model, criterion, metrics=[], tokenizer=None, device='cpu'):
+    def __init__(self, model, criterion, metric_name=None, tokenizer=None, device='cpu'):
         self.model = model
         self.criterion = criterion
-        self.metrics = {metric_name: get_metric(metric_name) for metric_name in metrics}
-        self.tokenizer = tokenizer if metrics != [] else None
+        self.metric_name = metric_name
+        self.metric = get_metric(metric_name) if metric_name is not None else None
+        self.tokenizer = tokenizer if metric_name is not None else None
         self.device = device
 
     def model_forward(self, x):
@@ -34,30 +35,11 @@ class BaseTrainer:
     def _get_optimizer(self, optimizer_fn, learning_rate):
         return optimizer_fn(self.model.parameters(), lr=learning_rate)
 
-    def _get_history(self):
-        history = {'loss': []}
-        for metric_name in self.metrics.keys():
-            history[metric_name] = []
-        return history
+    def _trainer_loop(self, dataloader, is_training: bool = True, **kwargs):
+        optimizer = self._get_optimizer(kwargs['optimizer'], kwargs['learning_rate']) if is_training else None
 
-    def _reduce_history(self, history, reduction_method: str = 'mean'):
-        reduced_history = {}
-        if reduction_method == 'mean':
-            for metric_name in history.keys():
-                reduced_history[metric_name] = np.mean(history[metric_name])
-        elif reduction_method == 'sum':
-            for metric_name in history.keys():
-                reduced_history[metric_name] = np.sum(history[metric_name])
-        elif reduction_method == 'last':
-            for metric_name in history.keys():
-                reduced_history[metric_name] = history[metric_name][-1]
-        else:
-            reduced_history = history
-        return reduced_history
-
-    def _trainer_loop(self, dataloader, is_training: bool = True, keep_history: bool = True, **kwargs):
-        optimizer = self._get_optimizer(**kwargs) if is_training else None
-        history = self._get_history() if keep_history else None
+        losses = []
+        metrics = []
 
         self.model.train() if is_training else self.model.eval()
         with torch.set_grad_enabled(is_training):
@@ -79,24 +61,22 @@ class BaseTrainer:
                     loss.backward()
                     optimizer.step()
 
-                # tokenize y and y_pred to get metrics
+                # add loss to losses
+                losses.append(loss.item())
+
+                # tokenize y and y_pred to add metric to metrics
                 if self.tokenizer is not None:
                     y_pred = y_pred.argmax(dim=-1)
                     y = [self.tokenizer.detokenize(sent, skip_special_tokens=True) for sent in y]
                     y_pred = [self.tokenizer.detokenize(sent, skip_special_tokens=True) for sent in y_pred]
 
-                if keep_history:
-                    history['loss'].append(loss.item())
-
-                    for metric_name, metric in self.metrics.items():
-                        history[metric_name].append(metric(pred=y_pred, target=y))
+                    metrics.append(self.metric(pred=y_pred, target=y))
 
                     # update progress bar postfix using the mean
-                    postfix_dict = self._reduce_history(history, kwargs.get('reduction_method', 'mean')) # {'loss': np.mean(history['loss']), **{metric_name: np.mean(history[metric_name]) for metric_name in self.metrics.keys()}}
+                    postfix_dict = {'loss': np.mean(losses), self.metric_name: np.mean(metrics)}
                     pbar.set_postfix(postfix_dict)
 
-        if keep_history:
-            return self._reduce_history(history, reduction_method=kwargs.get('reduction_method', 'mean'))
+        return np.mean(losses), np.mean(metrics)
 
     def train(self, dataloader, **kwargs):
         return self._trainer_loop(dataloader, is_training=True, **kwargs)
