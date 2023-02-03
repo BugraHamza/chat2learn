@@ -125,6 +125,8 @@ def train_lstm(train_path: str, tokenizer_path: str, **kwargs):
     max_len = kwargs.get('max_len', 100)
     device = kwargs.get('device', 'cpu')
     batch_size = kwargs.get('batch_size', 8)
+    learning_rate = kwargs.get('learning_rate', 1.0)
+    epochs = kwargs.get('epochs', 1)
     validation_path = kwargs.get('valset_path', None)
     metric = kwargs.get('metric', 'rouge')
     model_path = kwargs.get('model_path', None)
@@ -148,7 +150,7 @@ def train_lstm(train_path: str, tokenizer_path: str, **kwargs):
     trainer = LSTMTrainer(model=model, criterion=nn.NLLLoss(),
                           metric_name=metric, tokenizer=tokenizer, device=device)
 
-    trainer.fit(train_loader, epochs=1, optimizer=optim.Adadelta, learning_rate=1)
+    trainer.fit(train_loader, epochs=epochs, optimizer=optim.Adadelta, learning_rate=learning_rate)
 
     if validation_path is not None:
         val_dataset = LSTMDataset(validation_path, tokenizer_path, max_len=max_len, device=device)
@@ -174,12 +176,12 @@ def objective(trial, device='cpu'):
     n_layers = trial.suggest_int('n_layers', 1, 4)
     n_hidden = trial.suggest_int('n_hidden', 64, 256)
 
-    batch_size = trial.suggest_int('batch_size', 4, 128)
+    batch_size = trial.suggest_int('batch_size', 4, 64)
     learning_rate = trial.suggest_float('learning_rate', 1e-6, 1e-1, log=True)
 
     return train_lstm(train_path=train_path, valset_path=val_path, tokenizer_path=tokenizer_path, metric='rouge',
                       embed_dim=embed_dim, n_layers=n_layers, n_hidden=n_hidden, dropout_rate=dropout_rate,
-                      batch_size=batch_size, learning_rate=learning_rate, max_len=max_len, device=device)
+                      batch_size=batch_size, learning_rate=learning_rate, max_len=max_len, epochs=7, device=device)
 
 
 def main(device):
